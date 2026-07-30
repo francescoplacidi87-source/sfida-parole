@@ -1,0 +1,215 @@
+
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Sfida Parole</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<link rel="manifest" href="manifest.json">
+
+</head>
+
+
+<body>
+
+
+<div id="app">
+
+
+<h1>🎬 SFIDA PAROLE</h1>
+
+
+<div id="menu">
+
+<button onclick="showSetup()">
+▶ NUOVA PARTITA
+</button>
+
+
+<button onclick="showArchive()">
+📚 ARCHIVIO
+</button>
+
+</div>
+
+
+
+
+
+<div id="setup" class="hidden">
+
+
+<h2>Scegli durata</h2>
+
+
+<button onclick="startGame(55)">
+55 secondi
+</button>
+
+
+<button onclick="startGame(60)">
+60 secondi
+</button>
+
+
+<button onclick="startGame(65)">
+65 secondi
+</button>
+
+
+</div>
+
+
+
+
+
+
+
+<div id="archive" class="hidden">
+
+
+<h2>📚 Archivio parole</h2>
+
+
+<input id="newWord" placeholder="Inserisci parola">
+
+
+<select id="newType">
+
+<option value="false">
+Normale
+</option>
+
+
+<option value="true">
+⭐ Raddoppio
+</option>
+
+</select>
+
+
+<button onclick="addWord()">
+➕ SALVA
+</button>
+
+
+<div id="wordCount"></div>
+
+
+<div id="wordList"></div>
+
+
+<button onclick="resetArchive()">
+🗑 RESET ARCHIVIO
+</button>
+
+
+<button onclick="backMenu()">
+⬅ INDIETRO
+</button>
+
+
+</div>
+
+
+
+
+
+
+
+
+<div id="game" class="hidden">
+
+
+<div id="timer">
+⏱ 60
+</div>
+
+
+<div id="word">
+</div>
+
+
+<div id="score">
+0
+</div>
+
+
+<button onclick="startTurn()">
+▶ VIA
+</button>
+
+
+<button id="pauseButton" onclick="pauseGame()">
+⏸ STOP
+</button>
+
+
+<button onclick="correct()">
+✓ PRESA
+</button>
+
+
+<button onclick="wrong()">
+✕ SBAGLIATA
+</button>
+
+
+<button onclick="doubleWord()">
+⭐ RADDOPPIO
+</button>
+
+
+<button onclick="exitGame()">
+🏠 ESCI PARTITA
+</button>
+
+
+</div>
+
+
+
+
+
+
+
+
+<div id="result" class="hidden">
+
+
+<h2>
+⏱ TEMPO SCADUTO
+</h2>
+
+
+<h1 id="finalScore">
+0
+</h1>
+
+
+<button onclick="location.reload()">
+NUOVA PARTITA
+</button>
+
+
+</div>
+
+
+
+</div>
+
+
+
+<script src="js/script.js"></script>
+
+
+</body>
+
+</html>
