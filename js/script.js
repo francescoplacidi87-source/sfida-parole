@@ -538,3 +538,5 @@ window.addWord = addWord;
 window.resetArchive = resetArchive;
 window.backMenu = backMenu;
 window.endGame = endGame;
+
+window.startTurn = startTurn;
