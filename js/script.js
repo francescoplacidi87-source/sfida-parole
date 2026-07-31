@@ -207,18 +207,21 @@ button.innerHTML="⏸ STOP";
 
 function nextWord(){
 
-let list=words.filter(w=>!w.d);
+let list = words.filter(w => !w.d && !usedWords.includes(w.t));
 
 
-if(list.length===0){
+if(list.length === 0){
 
-return;
+usedWords = [];
+
+list = words.filter(w => !w.d);
 
 }
 
 
-current=list[Math.floor(Math.random()*list.length)];
+current = list[Math.floor(Math.random()*list.length)];
 
+usedWords.push(current.t);
 
 showWord(current.t);
 
