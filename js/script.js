@@ -1,3 +1,4 @@
+import { db, collection, getDocs, addDoc } from "../firebase.js";
 const defaultWords = [
 
 {t:"ELEFANTE", d:false},
