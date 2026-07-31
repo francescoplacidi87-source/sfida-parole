@@ -68,6 +68,8 @@ paused = false;
 
 doubleActive = false;
 
+  usedWords = [];
+
 gameStarted = false;
 
 
