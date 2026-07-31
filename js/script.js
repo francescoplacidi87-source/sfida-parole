@@ -1,18 +1,15 @@
 import { db, collection, getDocs, addDoc } from "../firebase.js";
+
+
 const defaultWords = [
 
 {t:"ELEFANTE", d:false},
-
 {t:"TELEFONO", d:false},
-
 {t:"MONTAGNA", d:false},
-
 {t:"PIZZA", d:false},
 
 {t:"STATUA DELLA LIBERTÀ", d:true},
-
 {t:"RITORNO AL FUTURO", d:true},
-
 {t:"TORRE DI PISA", d:true}
 
 ];
@@ -34,11 +31,14 @@ let current = null;
 
 let paused = false;
 
-let usedWords = [];
+let gameStarted = false;
 
 let doubleActive = false;
 
-let gameStarted = false;
+
+let usedNormal = [];
+
+let usedDouble = [];
 
 
 
@@ -56,8 +56,6 @@ document.getElementById("setup").classList.remove("hidden");
 
 
 
-
-
 function startGame(seconds){
 
 time = seconds;
@@ -66,18 +64,14 @@ score = 0;
 
 paused = false;
 
-doubleActive = false;
-
-  usedWords = [];
-
 gameStarted = false;
 
+doubleActive = false;
 
-if(interval){
 
-clearInterval(interval);
+usedNormal = [];
 
-}
+usedDouble = [];
 
 
 document.getElementById("setup").classList.add("hidden");
@@ -89,11 +83,7 @@ document.getElementById("word").innerHTML="";
 
 updateScreen();
 
-
 }
-
-
-
 
 
 
@@ -143,16 +133,7 @@ endGame();
 
 
 
-
-
 function pauseGame(){
-
-if(!gameStarted){
-
-return;
-
-}
-
 
 paused=!paused;
 
@@ -168,38 +149,12 @@ button.innerHTML="▶ RIPRENDI";
 
 else{
 
-
-if(doubleActive){
-
-
-let list=words.filter(w=>w.d);
-
-
-if(list.length>0){
-
-current=list[Math.floor(Math.random()*list.length)];
-
-showWord("⭐ "+current.t);
-
-}
-
-}
-
-else{
-
-nextWord();
-
-}
-
-
 button.innerHTML="⏸ STOP";
 
 }
 
+
 }
-
-
-
 
 
 
@@ -207,35 +162,62 @@ button.innerHTML="⏸ STOP";
 
 function nextWord(){
 
-let list = words.filter(w => !w.d && !usedWords.includes(w.t));
+
+let list;
 
 
-if(list.length === 0){
+if(doubleActive){
 
-usedWords = [];
 
-list = words.filter(w => !w.d);
+list = words.filter(w => w.d && !usedDouble.includes(w.t));
+
+
+if(list.length===0){
+
+usedDouble=[];
+
+list = words.filter(w=>w.d);
 
 }
 
 
-current = list[Math.floor(Math.random()*list.length)];
+current=list[Math.floor(Math.random()*list.length)];
 
-usedWords.push(current.t);
+usedDouble.push(current.t);
+
+
+doubleActive=false;
+
+
+}
+
+
+else{
+
+
+list = words.filter(w => !w.d && !usedNormal.includes(w.t));
+
+
+if(list.length===0){
+
+usedNormal=[];
+
+list=words.filter(w=>!w.d);
+
+}
+
+
+current=list[Math.floor(Math.random()*list.length)];
+
+usedNormal.push(current.t);
+
+
+}
+
+
 
 showWord(current.t);
 
-}
-
-
-
-
-
-
-
-function doubleWord(){
-
-doubleActive=true;
 
 }
 
@@ -255,10 +237,11 @@ box.classList.remove("wordIn");
 box.classList.add("wordOut");
 
 
-
 setTimeout(()=>{
 
+
 box.innerHTML=text;
+
 
 box.classList.remove("wordOut");
 
@@ -275,18 +258,37 @@ box.classList.add("wordIn");
 
 
 
+
+function doubleWord(){
+
+doubleActive=true;
+
+}
+
+
+
+
+
+
+
 function correct(){
 
 score += doubleActive ? 2 : 1;
 
+if(score<0){
+
+score=0;
+
+}
+
 
 doubleActive=false;
 
+nextWord();
 
 updateScreen();
 
 }
-
 
 
 
@@ -298,7 +300,7 @@ function wrong(){
 score -= doubleActive ? 2 : 1;
 
 
-if(score < 0){
+if(score<0){
 
 score=0;
 
@@ -307,8 +309,23 @@ score=0;
 
 doubleActive=false;
 
+nextWord();
 
 updateScreen();
+
+}
+
+
+
+
+
+
+
+function skip(){
+
+doubleActive=false;
+
+nextWord();
 
 }
 
@@ -332,7 +349,9 @@ document.getElementById("score").innerHTML=score;
 
 
 
+
 function exitGame(){
+
 
 if(interval){
 
@@ -342,8 +361,6 @@ clearInterval(interval);
 
 
 gameStarted=false;
-
-doubleActive=false;
 
 
 document.getElementById("game").classList.add("hidden");
@@ -371,6 +388,7 @@ clearInterval(interval);
 document.getElementById("game").classList.add("hidden");
 
 document.getElementById("result").classList.remove("hidden");
+
 
 document.getElementById("finalScore").innerHTML=score;
 
@@ -486,7 +504,9 @@ w.t+
 
 });
 
+
 }
+
 
 
 
@@ -507,36 +527,44 @@ location.reload();
 
 
 
-function backMenu(){
 
-window.showSetup = showSetup;
-window.startGame = startGame;
-window.startTurn = startTurn;
-window.pauseGame = pauseGame;
-window.correct = correct;
-window.wrong = wrong;
-window.doubleWord = doubleWord;
-window.exitGame = exitGame;
-window.showArchive = showArchive;
-window.addWord = addWord;
-window.resetArchive = resetArchive;
-window.backMenu = backMenu;
+
+function backMenu(){
 
 document.getElementById("archive").classList.add("hidden");
 
 document.getElementById("menu").classList.remove("hidden");
 
 }
-window.showSetup = showSetup;
-window.startGame = startGame;
-window.pauseGame = pauseGame;
-window.correct = correct;
-window.wrong = wrong;
-window.doubleWord = doubleWord;
-window.showArchive = showArchive;
-window.addWord = addWord;
-window.resetArchive = resetArchive;
-window.backMenu = backMenu;
-window.endGame = endGame;
 
-window.startTurn = startTurn;
+
+
+
+
+
+
+window.showSetup=showSetup;
+
+window.startGame=startGame;
+
+window.startTurn=startTurn;
+
+window.pauseGame=pauseGame;
+
+window.correct=correct;
+
+window.wrong=wrong;
+
+window.doubleWord=doubleWord;
+
+window.exitGame=exitGame;
+
+window.showArchive=showArchive;
+
+window.addWord=addWord;
+
+window.resetArchive=resetArchive;
+
+window.backMenu=backMenu;
+
+window.endGame=endGame;
