@@ -520,3 +520,14 @@ document.getElementById("archive").classList.add("hidden");
 document.getElementById("menu").classList.remove("hidden");
 
 }
+window.showSetup = showSetup;
+window.startGame = startGame;
+window.pauseGame = pauseGame;
+window.correct = correct;
+window.wrong = wrong;
+window.doubleWord = doubleWord;
+window.showArchive = showArchive;
+window.addWord = addWord;
+window.resetArchive = resetArchive;
+window.backMenu = backMenu;
+window.endGame = endGame;
