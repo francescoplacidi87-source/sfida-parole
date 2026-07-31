@@ -34,6 +34,8 @@ let current = null;
 
 let paused = false;
 
+let usedWords = [];
+
 let doubleActive = false;
 
 let gameStarted = false;
