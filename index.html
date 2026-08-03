@@ -1,11 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="it">
 
 <head>
 
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Sfida Parole</title>
@@ -26,12 +24,13 @@
 <h1>🎬 SFIDA PAROLE</h1>
 
 
+<!-- MENU -->
+
 <div id="menu">
 
 <button onclick="showSetup()">
 ▶ NUOVA PARTITA
 </button>
-
 
 <button onclick="showArchive()">
 📚 ARCHIVIO
@@ -42,9 +41,9 @@
 
 
 
+<!-- SCELTA DURATA -->
 
 <div id="setup" class="hidden">
-
 
 <h2>Scegli durata</h2>
 
@@ -64,6 +63,11 @@
 </button>
 
 
+<button onclick="backMenu()">
+⬅ INDIETRO
+</button>
+
+
 </div>
 
 
@@ -71,6 +75,7 @@
 
 
 
+<!-- ARCHIVIO -->
 
 <div id="archive" class="hidden">
 
@@ -78,7 +83,10 @@
 <h2>📚 Archivio parole</h2>
 
 
-<input id="newWord" placeholder="Inserisci parola">
+<input 
+id="newWord"
+placeholder="Inserisci parola"
+>
 
 
 <select id="newType">
@@ -86,7 +94,6 @@
 <option value="false">
 Normale
 </option>
-
 
 <option value="true">
 ⭐ Raddoppio
@@ -125,6 +132,8 @@ Normale
 
 
 
+<!-- GIOCO -->
+
 <div id="game" class="hidden">
 
 
@@ -133,23 +142,27 @@ Normale
 </div>
 
 
-<div id="word">
-</div>
-
-
 <div id="score">
 0
 </div>
 
 
-<button onclick="startTurn()">
+<div id="word">
+</div>
+
+
+
+
+<button 
+id="mainButton"
+onclick="mainAction()"
+>
 ▶ VIA
 </button>
 
 
-<button id="pauseButton" onclick="pauseGame()">
-⏸ STOP
-</button>
+
+<div class="gameButtons">
 
 
 <button onclick="correct()">
@@ -167,6 +180,19 @@ Normale
 </button>
 
 
+</div>
+
+
+
+<button 
+id="pauseButton"
+onclick="pauseGame()"
+>
+⏸ STOP
+</button>
+
+
+
 <button onclick="exitGame()">
 🏠 ESCI PARTITA
 </button>
@@ -180,6 +206,8 @@ Normale
 
 
 
+
+<!-- RISULTATO -->
 
 <div id="result" class="hidden">
 
@@ -200,6 +228,14 @@ NUOVA PARTITA
 
 
 </div>
+
+
+
+
+
+<footer>
+v2.0
+</footer>
 
 
 
