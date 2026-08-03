@@ -160,6 +160,39 @@ onclick="mainAction()"
 ▶ VIA
 </button>
 
+  function mainAction(){
+
+    if(!gameStarted){
+
+        gameStarted = true;
+
+        waitingNext = false;
+
+        nextWord();
+
+        startTimer();
+
+        document.getElementById("mainButton")
+            .innerHTML = "⏸ STOP";
+
+        return;
+    }
+
+
+    if(waitingNext){
+
+        waitingNext = false;
+
+        nextWord();
+
+        document.getElementById("mainButton")
+            .innerHTML = "⏸ STOP";
+
+        return;
+    }
+
+}
+
 
 
 <div class="gameButtons">
