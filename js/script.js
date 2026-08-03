@@ -98,12 +98,16 @@ function mainAction(){
 
         gameStarted = true;
 
+        waitingNext = false;
+
         nextWord();
 
         startTimer();
 
-        return;
+        document.getElementById("mainButton")
+            .innerHTML = "⏸ STOP";
 
+        return;
     }
 
 
@@ -111,11 +115,15 @@ function mainAction(){
 
         waitingNext = false;
 
+        nextWord();
+
         document.getElementById("mainButton")
             .innerHTML = "⏸ STOP";
 
+        return;
+    }
 
-        nextWord();
+}
 
     }
 
