@@ -2,86 +2,203 @@ import { db, collection, getDocs, addDoc } from "../firebase.js";
 
 
 const defaultWords = [
+    { t:"ELEFANTE", d:false },
+    { t:"TELEFONO", d:false },
+    { t:"MONTAGNA", d:false },
+    { t:"PIZZA", d:false },
 
-{t:"ELEFANTE", d:false},
-{t:"TELEFONO", d:false},
-{t:"MONTAGNA", d:false},
-{t:"PIZZA", d:false},
-
-{t:"STATUA DELLA LIBERTÀ", d:true},
-{t:"RITORNO AL FUTURO", d:true},
-{t:"TORRE DI PISA", d:true}
-
+    { t:"STATUA DELLA LIBERTÀ", d:true },
+    { t:"RITORNO AL FUTURO", d:true },
+    { t:"TORRE DI PISA", d:true }
 ];
 
 
-let words =
-JSON.parse(localStorage.getItem("sfidaParole"))
-||
-defaultWords;
+let words = JSON.parse(
+    localStorage.getItem("sfidaParole")
+) || defaultWords;
 
+
+let normalQueue = [];
+let doubleQueue = [];
+
+let currentWord = "";
 
 let score = 0;
-
 let time = 60;
 
-let interval = null;
-
-let current = null;
-
-let paused = false;
+let timer = null;
 
 let gameStarted = false;
+let waitingNext = false;
 
-let doubleActive = false;
+let doubleNext = false;
 
-
-let usedNormal = [];
-
-let usedDouble = [];
-
-
+let paused = false;
 
 
 
 function showSetup(){
 
-document.getElementById("menu").classList.add("hidden");
+    document.getElementById("menu")
+        .classList.add("hidden");
 
-document.getElementById("setup").classList.remove("hidden");
+    document.getElementById("setup")
+        .classList.remove("hidden");
 
 }
-
-
 
 
 
 function startGame(seconds){
 
-time = seconds;
+    time = seconds;
+    score = 0;
 
-score = 0;
-
-paused = false;
-
-gameStarted = false;
-
-doubleActive = false;
+    gameStarted = false;
+    waitingNext = false;
+    paused = false;
+    doubleNext = false;
 
 
-usedNormal = [];
-
-usedDouble = [];
-
-
-document.getElementById("setup").classList.add("hidden");
-
-document.getElementById("game").classList.remove("hidden");
+    normalQueue = words
+        .filter(w => !w.d)
+        .sort(() => Math.random() - 0.5);
 
 
-document.getElementById("word").innerHTML="";
+    doubleQueue = words
+        .filter(w => w.d)
+        .sort(() => Math.random() - 0.5);
 
-updateScreen();
+
+    document.getElementById("setup")
+        .classList.add("hidden");
+
+
+    document.getElementById("game")
+        .classList.remove("hidden");
+
+
+    document.getElementById("word")
+        .innerHTML = "";
+
+
+    document.getElementById("mainButton")
+        .innerHTML = "▶ VIA";
+
+
+    updateScreen();
+
+}
+
+
+
+function mainAction(){
+
+    if(!gameStarted){
+
+        gameStarted = true;
+
+        nextWord();
+
+        startTimer();
+
+        return;
+
+    }
+
+
+    if(waitingNext){
+
+        waitingNext = false;
+
+        document.getElementById("mainButton")
+            .innerHTML = "⏸ STOP";
+
+
+        nextWord();
+
+    }
+
+}
+
+
+
+function startTimer(){
+
+    if(timer){
+
+        clearInterval(timer);
+
+    }
+
+
+    timer = setInterval(()=>{
+
+
+        if(!paused && gameStarted && !waitingNext){
+
+            time--;
+
+            updateScreen();
+
+
+            if(time <= 0){
+
+                endGame();
+
+            }
+
+        }
+
+
+    },1000);
+
+
+}
+
+function nextWord(){
+
+    let selected;
+
+
+    if(doubleNext){
+
+        if(doubleQueue.length === 0){
+
+            doubleQueue = words
+                .filter(w => w.d)
+                .sort(() => Math.random() - 0.5);
+
+        }
+
+
+        selected = doubleQueue.shift();
+
+        doubleNext = false;
+
+    }
+
+    else{
+
+
+        if(normalQueue.length === 0){
+
+            normalQueue = words
+                .filter(w => !w.d)
+                .sort(() => Math.random() - 0.5);
+
+        }
+
+
+        selected = normalQueue.shift();
+
+    }
+
+
+    currentWord = selected.t;
+
+
+    showWord(currentWord);
 
 }
 
@@ -89,43 +206,92 @@ updateScreen();
 
 
 
-function startTurn(){
+function showWord(text){
 
-if(gameStarted){
+    const box = document.getElementById("word");
 
-return;
+
+    box.innerHTML = text;
+
 
 }
 
 
-gameStarted=true;
 
 
-nextWord();
+
+function correct(){
+
+    if(!gameStarted || waitingNext){
+
+        return;
+
+    }
 
 
-interval=setInterval(()=>{
+    score += 1;
 
 
-if(!paused){
-
-time--;
-
-updateScreen();
+    waitingNext = true;
 
 
-if(time<=0){
+    document.getElementById("mainButton")
+        .innerHTML = "▶ RIPRENDI";
 
-clearInterval(interval);
 
-endGame();
+    updateScreen();
 
 }
 
+
+
+
+
+function wrong(){
+
+    if(!gameStarted || waitingNext){
+
+        return;
+
+    }
+
+
+    score -= 1;
+
+
+    if(score < 0){
+
+        score = 0;
+
+    }
+
+
+    waitingNext = true;
+
+
+    document.getElementById("mainButton")
+        .innerHTML = "▶ RIPRENDI";
+
+
+    updateScreen();
+
 }
 
 
-},1000);
+
+
+
+function doubleWord(){
+
+    if(!gameStarted || waitingNext){
+
+        return;
+
+    }
+
+
+    doubleNext = true;
+
 
 }
 
@@ -135,216 +301,26 @@ endGame();
 
 function pauseGame(){
 
-paused=!paused;
+    paused = !paused;
 
 
-let button=document.getElementById("pauseButton");
+    const button =
+        document.getElementById("pauseButton");
 
 
-if(paused){
+    if(paused){
 
-button.innerHTML="▶ RIPRENDI";
+        button.innerHTML = "▶ CONTINUA";
 
-}
+    }
 
-else{
+    else{
 
-button.innerHTML="⏸ STOP";
+        button.innerHTML = "⏸ STOP";
 
-}
-
-
-}
-
-
-
-
-
-function nextWord(){
-
-
-let list;
-
-
-if(doubleActive){
-
-
-list = words.filter(w => w.d && !usedDouble.includes(w.t));
-
-
-if(list.length===0){
-
-usedDouble=[];
-
-list = words.filter(w=>w.d);
+    }
 
 }
-
-
-current=list[Math.floor(Math.random()*list.length)];
-
-usedDouble.push(current.t);
-
-
-doubleActive=false;
-
-
-}
-
-
-else{
-
-
-list = words.filter(w => !w.d && !usedNormal.includes(w.t));
-
-
-if(list.length===0){
-
-usedNormal=[];
-
-list=words.filter(w=>!w.d);
-
-}
-
-
-current=list[Math.floor(Math.random()*list.length)];
-
-usedNormal.push(current.t);
-
-
-}
-
-
-
-showWord(current.t);
-
-
-}
-
-
-
-
-
-
-
-function showWord(text){
-
-let box=document.getElementById("word");
-
-
-box.classList.remove("wordIn");
-
-box.classList.add("wordOut");
-
-
-setTimeout(()=>{
-
-
-box.innerHTML=text;
-
-
-box.classList.remove("wordOut");
-
-box.classList.add("wordIn");
-
-
-},250);
-
-}
-
-
-
-
-
-
-
-
-function doubleWord(){
-
-doubleActive=true;
-
-}
-
-
-
-
-
-
-
-function correct(){
-
-score += doubleActive ? 2 : 1;
-
-if(score<0){
-
-score=0;
-
-}
-
-
-doubleActive=false;
-
-nextWord();
-
-updateScreen();
-
-}
-
-
-
-
-
-
-function wrong(){
-
-score -= doubleActive ? 2 : 1;
-
-
-if(score<0){
-
-score=0;
-
-}
-
-
-doubleActive=false;
-
-nextWord();
-
-updateScreen();
-
-}
-
-
-
-
-
-
-
-function skip(){
-
-doubleActive=false;
-
-nextWord();
-
-}
-
-
-
-
-
-
-
-function updateScreen(){
-
-document.getElementById("timer").innerHTML="⏱ "+time;
-
-document.getElementById("score").innerHTML=score;
-
-}
-
-
-
 
 
 
@@ -353,24 +329,42 @@ document.getElementById("score").innerHTML=score;
 function exitGame(){
 
 
-if(interval){
+    if(timer){
 
-clearInterval(interval);
+        clearInterval(timer);
+
+    }
+
+
+    gameStarted = false;
+
+    waitingNext = false;
+
+
+    document.getElementById("game")
+        .classList.add("hidden");
+
+
+    document.getElementById("menu")
+        .classList.remove("hidden");
+
 
 }
 
 
-gameStarted=false;
 
 
-document.getElementById("game").classList.add("hidden");
 
-document.getElementById("menu").classList.remove("hidden");
+function updateScreen(){
 
+    document.getElementById("timer")
+        .innerHTML = "⏱ " + time;
+
+
+    document.getElementById("score")
+        .innerHTML = score;
 
 }
-
-
 
 
 
@@ -378,40 +372,45 @@ document.getElementById("menu").classList.remove("hidden");
 
 function endGame(){
 
-if(interval){
 
-clearInterval(interval);
+    if(timer){
+
+        clearInterval(timer);
+
+    }
+
+
+    gameStarted = false;
+
+
+    document.getElementById("game")
+        .classList.add("hidden");
+
+
+    document.getElementById("result")
+        .classList.remove("hidden");
+
+
+    document.getElementById("finalScore")
+        .innerHTML = score;
+
 
 }
-
-
-document.getElementById("game").classList.add("hidden");
-
-document.getElementById("result").classList.remove("hidden");
-
-
-document.getElementById("finalScore").innerHTML=score;
-
-}
-
-
-
-
-
-
 
 
 function showArchive(){
 
-document.getElementById("menu").classList.add("hidden");
+    document.getElementById("menu")
+        .classList.add("hidden");
 
-document.getElementById("archive").classList.remove("hidden");
 
-showWords();
+    document.getElementById("archive")
+        .classList.remove("hidden");
+
+
+    showWords();
 
 }
-
-
 
 
 
@@ -419,38 +418,40 @@ showWords();
 
 function addWord(){
 
-let text=document.getElementById("newWord").value;
+    const text =
+        document.getElementById("newWord").value.trim();
 
-let type=document.getElementById("newType").value;
+
+    const type =
+        document.getElementById("newType").value;
 
 
-if(text.trim()==""){
+    if(text === ""){
 
-return;
+        return;
+
+    }
+
+
+    words.push({
+
+        t:text.toUpperCase(),
+
+        d:type === "true"
+
+    });
+
+
+    saveWords();
+
+
+    document.getElementById("newWord")
+        .value = "";
+
+
+    showWords();
 
 }
-
-
-words.push({
-
-t:text.toUpperCase(),
-
-d:type=="true"
-
-});
-
-
-saveWords();
-
-
-document.getElementById("newWord").value="";
-
-
-showWords();
-
-}
-
-
 
 
 
@@ -458,17 +459,12 @@ showWords();
 
 function saveWords(){
 
-localStorage.setItem(
-
-"sfidaParole",
-
-JSON.stringify(words)
-
-);
+    localStorage.setItem(
+        "sfidaParole",
+        JSON.stringify(words)
+    );
 
 }
-
-
 
 
 
@@ -476,39 +472,40 @@ JSON.stringify(words)
 
 function showWords(){
 
-let box=document.getElementById("wordList");
-
-box.innerHTML="";
-
-
-document.getElementById("wordCount").innerHTML=
-
-"Parole totali: "+words.length;
+    const box =
+        document.getElementById("wordList");
 
 
+    box.innerHTML = "";
 
-words.forEach((w,i)=>{
+
+    document.getElementById("wordCount")
+        .innerHTML =
+        "Parole totali: " + words.length;
 
 
-box.innerHTML +=
 
-"<p>"+
+    words.forEach((w,i)=>{
 
-(i+1)+". "+
 
-(w.d?"⭐ ":"")+
+        box.innerHTML +=
 
-w.t+
+        "<p>" +
 
-"</p>";
+        (i+1) +
 
-});
+        ". " +
+
+        (w.d ? "⭐ " : "") +
+
+        w.t +
+
+        "</p>";
+
+    });
 
 
 }
-
-
-
 
 
 
@@ -516,14 +513,12 @@ w.t+
 
 function resetArchive(){
 
-localStorage.removeItem("sfidaParole");
+    localStorage.removeItem("sfidaParole");
 
-location.reload();
+
+    location.reload();
 
 }
-
-
-
 
 
 
@@ -531,9 +526,20 @@ location.reload();
 
 function backMenu(){
 
-document.getElementById("archive").classList.add("hidden");
+    document.getElementById("setup")
+        .classList.add("hidden");
 
-document.getElementById("menu").classList.remove("hidden");
+
+    document.getElementById("archive")
+        .classList.add("hidden");
+
+
+    document.getElementById("game")
+        .classList.add("hidden");
+
+
+    document.getElementById("menu")
+        .classList.remove("hidden");
 
 }
 
@@ -541,30 +547,28 @@ document.getElementById("menu").classList.remove("hidden");
 
 
 
+window.showSetup = showSetup;
 
+window.startGame = startGame;
 
-window.showSetup=showSetup;
+window.mainAction = mainAction;
 
-window.startGame=startGame;
+window.pauseGame = pauseGame;
 
-window.startTurn=startTurn;
+window.correct = correct;
 
-window.pauseGame=pauseGame;
+window.wrong = wrong;
 
-window.correct=correct;
+window.doubleWord = doubleWord;
 
-window.wrong=wrong;
+window.exitGame = exitGame;
 
-window.doubleWord=doubleWord;
+window.endGame = endGame;
 
-window.exitGame=exitGame;
+window.showArchive = showArchive;
 
-window.showArchive=showArchive;
+window.addWord = addWord;
 
-window.addWord=addWord;
+window.resetArchive = resetArchive;
 
-window.resetArchive=resetArchive;
-
-window.backMenu=backMenu;
-
-window.endGame=endGame;
+window.backMenu = backMenu;
