@@ -227,74 +227,53 @@ function startTimer(){
 
 function nextWord(){
 
-
-
     let selected;
 
 
-
-    if(doubleActive){
-
-
+    if(nextIsDouble){
 
         if(doublePool.length === 0){
-
 
             doublePool =
                 words
                 .filter(w => w.d)
-                .sort(() => Math.random()-0.5);
-
+                .sort(() => Math.random() - 0.5);
 
         }
-
 
 
         selected = doublePool.shift();
 
+        currentIsDouble = true;
+
+        nextIsDouble = false;
 
 
-        doubleActive = false;
-
-
-
-    }
-
-    else{
-
+    } else {
 
 
         if(normalPool.length === 0){
 
-
             normalPool =
                 words
                 .filter(w => !w.d)
-                .sort(() => Math.random()-0.5);
-
+                .sort(() => Math.random() - 0.5);
 
         }
 
 
-
         selected = normalPool.shift();
 
+        currentIsDouble = false;
 
     }
 
 
-
-
     currentWord = selected;
-
-
 
     showWord(currentWord.t);
 
-
-
 }
-
 
 
 
