@@ -40,7 +40,8 @@ let gameStarted = false;
 
 let waitingAnswer = false;
 
-let doubleActive = false;
+let nextIsDouble = false;
+let currentIsDouble = false;
 
 
 
