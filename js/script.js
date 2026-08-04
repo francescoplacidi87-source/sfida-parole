@@ -190,8 +190,7 @@ function startTimer(){
 
     timer = setInterval(()=>{
 
-
-        if(gameStarted && !waitingAnswer){
+if(gameStarted){
 
 
             time--;
