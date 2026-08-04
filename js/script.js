@@ -311,7 +311,7 @@ function correct(){
 
 
 
-    score += doubleActive ? 2 : 1;
+    score += currentIsDouble ? 2 : 1;
 
 
 
