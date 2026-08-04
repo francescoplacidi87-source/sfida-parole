@@ -123,13 +123,6 @@ function mainAction(){
         return;
     }
 
-}
-
-    }
-
-}
-
-
 
 function startTimer(){
 
