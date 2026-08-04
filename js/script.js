@@ -403,18 +403,13 @@ function wrong(){
 
 function doubleWord(){
 
-
-
     if(!gameStarted || waitingAnswer){
-
         return;
-
     }
 
+    nextIsDouble = true;
 
-
-    doubleActive = true;
-
+}
 
 }
 
